@@ -249,14 +249,17 @@ class MdToExcelConverter:
         sheet = workbook.active
         sheet.title = self.sheet_name
         
+        # ワークブック全体のデフォルトフォントをメイリオに設定
+        # 注：openpyxlの制限により、これはワークブックレベルではなく各セルに適用する必要がある
+        
         # スタイルの定義
         heading_fonts = {
-            1: Font(bold=True, size=16, color="000000"),
-            2: Font(bold=True, size=14, color="000000"),
-            3: Font(bold=True, size=12, color="000000"),
-            4: Font(bold=True, size=11, color="000000"),
-            5: Font(bold=True, size=10, color="000000"),
-            6: Font(bold=True, size=10, color="000000")
+            1: Font(name='メイリオ', bold=True, size=16, color="000000"),
+            2: Font(name='メイリオ', bold=True, size=14, color="000000"),
+            3: Font(name='メイリオ', bold=True, size=12, color="000000"),
+            4: Font(name='メイリオ', bold=True, size=11, color="000000"),
+            5: Font(name='メイリオ', bold=True, size=10, color="000000"),
+            6: Font(name='メイリオ', bold=True, size=10, color="000000")
         }
         
         heading_fills = {
@@ -277,14 +280,14 @@ class MdToExcelConverter:
         )
         
         # ヘッダースタイル（表用）
-        header_font = Font(bold=True)
+        header_font = Font(name='メイリオ', bold=True)
         header_fill = PatternFill(start_color="DDEBF7", end_color="DDEBF7", fill_type="solid")
         
         # 中央揃え
         center_alignment = Alignment(horizontal='center', vertical='center')
         
         # 箇条書きのスタイル
-        list_font = Font(name='Calibri', size=11)
+        list_font = Font(name='メイリオ', size=11)
         
         # 各セクションを追加
         for section in self.sections:
@@ -307,7 +310,8 @@ class MdToExcelConverter:
             # 段落を追加
             for paragraph in section['paragraphs']:
                 if paragraph.strip():  # 空の段落はスキップ
-                    sheet.cell(row=self.current_row, column=1, value=paragraph)
+                    cell = sheet.cell(row=self.current_row, column=1, value=paragraph)
+                    cell.font = Font(name='メイリオ', size=11)
                     self.current_row += 1
             
             # リストを追加
@@ -353,6 +357,7 @@ class MdToExcelConverter:
                             # 列インデックスが範囲外の場合は空白セルを追加
                             if col_index <= len(row_data):
                                 cell = sheet.cell(row=self.current_row, column=col_index, value=cell_value)
+                                cell.font = Font(name='メイリオ', size=11)
                                 cell.border = thin_border
                                 
                                 # カラム幅の再調整
@@ -390,7 +395,7 @@ def main():
     """
     parser = argparse.ArgumentParser(description="Markdownファイルをエクセルに変換するプログラム")
     parser.add_argument("input", help="入力Markdownファイルのパス")
-    parser.add_argument("-o", "--output", help="出力Excelファイルのパス（指定しない場合は入力ファイルと同じ名前で.xlsxとして保存）")
+    parser.add_argument("-o", "--output", help="出力Excelファイルのパス（指定しない場合は入力ファイル名と同じ名前で.xlsxとして保存）")
     parser.add_argument("-s", "--sheet", default="Sheet1", help="出力Excelファイルのシート名（デフォルト: Sheet1）")
     
     args = parser.parse_args()
